@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberBet - Prediction Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.skypack.dev/three@0.132.2"></script>
+    <style>
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background: #0a0a1f;
+            color: #00ff9d;
+        }
+        .cyber-gradient {
+            background: linear-gradient(45deg, #00ff9d33, #00ccff33);
+        }
+        .cyber-border {
+            border: 1px solid #00ff9d;
+            box-shadow: 0 0 10px #00ff9d40;
+        }
+        .cyber-glow {
+            text-shadow: 0 0 5px #00ff9d;
+        }
+        .stats-counter {
+            animation: count 2s ease-out;
+        }
+        @keyframes count {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .sliding-events {
+            animation: slide 20s linear infinite;
+        }
+        @keyframes slide {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        #three-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            width: 100%;
+            height: 100%;
+        }
+        .tab-active {
+            color: #00ccff;
+            border-bottom: 2px solid #00ccff;
+            padding-bottom: 3px;
+        }
+        .create-btn {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 255, 157, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 255, 157, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 255, 157, 0); }
+        }
+        .market-card {
+            transition: all 0.3s ease;
+        }
+        .market-card:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <canvas id="three-canvas"></canvas>
+
+    <!-- Header -->
+    <header class="fixed w-full top-0 z-50 bg-black/90 backdrop-blur-sm border-b border-[#00ff9d]/30">
+        <nav class="container mx-auto px-4 py-3">
+            <div class="flex items-center justify-between">
+                <h1 class="text-2xl font-bold cyber-glow">CYBERBET</h1>
+                <div class="flex space-x-6">
+                    <button id="tab-live" class="text-sm hover:text-[#00ccff] transition-colors tab-active">Live</button>
+                    <button id="tab-trending" class="text-sm hover:text-[#00ccff] transition-colors">Trending</button>
+                    <button id="tab-resolved" class="text-sm hover:text-[#00ccff] transition-colors">Resolved</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 pt-20 pb-24">
+        <!-- Stats Section -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 my-8">
+            <div class="cyber-border cyber-gradient rounded-lg p-6 text-center">
+                <h3 class="text-xl mb-2">Total Users</h3>
+                <p class="text-3xl font-bold stats-counter">15,487</p>
+            </div>
+            <div class="cyber-border cyber-gradient rounded-lg p-6 text-center">
+                <h3 class="text-xl mb-2">Total Bets</h3>
+                <p class="text-3xl font-bold stats-counter">156,234</p>
+            </div>
+            <div class="cyber-border cyber-gradient rounded-lg p-6 text-center">
+                <h3 class="text-xl mb-2">Volume</h3>
+                <p class="text-3xl font-bold stats-counter">$2.5M</p>
+            </div>
+        </div>
+
+        <!-- Sliding Events -->
+        <div class="overflow-hidden my-8 cyber-border rounded-lg">
+            <div class="sliding-events whitespace-nowrap py-4">
+                <span class="mx-4">🔥 BTC Price Prediction: $45,000 by EOY</span>
+                <span class="mx-4">⚡ ETH 2.0 Launch Success Rate</span>
+                <span class="mx-4">🎮 CS:GO Major Finals Prediction</span>
+                <span class="mx-4">📈 NASDAQ Weekly Close</span>
+                <span class="mx-4">🏆 FIFA World Cup 2026 Host Prediction</span>
+                <span class="mx-4">📱 Apple iPhone 16 Sales Forecast</span>
+            </div>
+        </div>
+
+        <!-- Tab Content -->
+        <div id="tab-content" class="my-8">
+            <!-- Live Tab Content (Default) -->
+            <div id="content-live" class="tab-content">
+                <h2 class="text-2xl font-bold mb-6 cyber-glow">Live Predictions</h2>
+                <!-- Market Types -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                    <div class="cyber-border rounded-lg p-6 hover:bg-[#00ff9d]/10 transition-colors cursor-pointer market-card">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl">Crypto Predictions</h3>
+                            <span class="bg-green-500/20 text-green-400 px-2 py-1 rounded text-xs">LIVE</span>
+                        </div>
+                        <p class="text-sm text-gray-400">Predict cryptocurrency prices and market movements</p>
+                        <div class="mt-4 flex justify-between">
+                            <span class="text-xs">24h Volume: $158K</span>
+                            <span class="text-xs">15 active markets</span>
+                        </div>
+                    </div>
+                    <div class="cyber-border rounded-lg p-6 hover:bg-[#00ff9d]/10 transition-colors cursor-pointer market-card">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl">Futures Trading</h3>
+                            <span class="bg-green-500/20 text-green-400 px-2 py-1 rounded text-xs">LIVE</span>
+                        </div>
+                        <p class="text-sm text-gray-400">Trade perpetual futures with up to 100x leverage</p>
+                        <div class="mt-4 flex justify-between">
+                            <span class="text-xs">24h Volume: $426K</span>
+                            <span class="text-xs">8 active markets</span>
+                        </div>
+                    </div>
+                    <div class="cyber-border rounded-lg p-6 hover:bg-[#00ff9d]/10 transition-colors cursor-pointer market-card">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl">Sports Betting</h3>
+                            <span class="bg-green-500/20 text-green-400 px-2 py-1 rounded text-xs">LIVE</span>
+                        </div>
+                        <p class="text-sm text-gray-400">Bet on your favorite sports and e-sports events</p>
+                        <div class="mt-4 flex justify-between">
+                            <span class="text-xs">24h Volume: $295K</span>
+                            <span class="text-xs">32 active markets</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Featured Bets -->
+                <h3 class="text-xl mb-4 cyber-glow">Featured Bets</h3>
+                <div class="space-y-4">
+                    <div class="cyber-border rounded-lg p-4 hover:bg-[#00ff9d]/10 transition-colors cursor-pointer">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h4 class="font-medium">BTC > $40K by June 30th</h4>
+                                <p class="text-sm text-gray-400">Ends in 3d 14h 22m</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm">YES: 64%</p>
+                                <p class="text-sm">NO: 36%</p>
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
+                            <div class="bg-[#00ff9d] h-2 rounded-full" style="width: 64%"></div>
+                        </div>
+                    </div>
+                    <div class="cyber-border rounded-lg p-4 hover:bg-[#00ff9d]/10 transition-colors cursor-pointer">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h4 class="font-medium">Lakers win NBA Finals</h4>
+                                <p class="text-sm text-gray-400">Ends in 1m 15d 6h</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm">YES: 48%</p>
+                                <p class="text-sm">NO: 52%</p>
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
+                            <div class="bg-[#00ff9d] h-2 rounded-full" style="width: 48%"></div>
+                        </div>
+                    </div>
+                    <div class="cyber-border rounded-lg p-4 hover:bg-[#00ff9d]/10 transition-colors cursor-pointer">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h4 class="font-medium">ETH 2.0 launch this year</h4>
+                                <p class="text-sm text-gray-400">Ends in 6m 12d 3h</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm">YES: 72%</p>
+                                <p class="text-sm">NO: 28%</p>
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
+                            <div class="bg-[#00ff9d] h-2 rounded-full" style="width: 72%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trending Tab Content (Hidden by default) -->
+            <div id="content-trending" class="tab-content hidden">
+                <h2 class="text-2xl font-bold mb-6 cyber-glow">Trending Predictions</h2>
+                <div class="space-y-4">
+                    <div class="cyber-border rounded-lg p-4 hover:bg-[#00ff9d]/10 transition-colors cursor-pointer">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h4 class="font-medium">Solana $100 by July</h4>
+                                <p class="text-sm text-gray-400">Volume: $152K (↑324%)</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm">YES: 81%</p>
+                                <p class="text-sm">NO: 19%</p>
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
+                            <div class="bg-[#00ff9d] h-2 rounded-full" style="width: 81%"></div>
+                        </div>
+                    </div>
+                    <div class="cyber-border rounded-lg p-4 hover:bg-[#00ff9d]/10 transition-colors cursor-pointer">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h4 class="font-medium">Trump vs Biden 2024</h4>
+                                <p class="text-sm text-gray-400">Volume: $486K (↑218%)</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm">Trump: 58%</p>
+                                <p class="text-sm">Biden: 42%</p>
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
+                            <div class="bg-[#00ff9d] h-2 rounded-full" style="width: 58%"></div>
+                        </div>
+                    </div>
+                    <div class="cyber-border rounded-lg p-4 hover:bg-[#00ff9d]/10 transition-colors cursor-pointer">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h4 class="font-medium">FIFA World Cup Winner</h4>
+                                <p class="text-sm text-gray-400">Volume: $315K (↑156%)</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm">Brazil: 35%</p>
+                                <p class="text-sm">France: 28%</p>
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
+                            <div class="bg-[#00ff9d] h-2 rounded-full" style="width: 35%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resolved Tab Content (Hidden by default) -->
+            <div id="content-resolved" class="tab-content hidden">
+                <h2 class="text-2xl font-bold mb-6 cyber-glow">Resolved Predictions</h2>
+                <div class="space-y-4">
+                    <div class="cyber-border rounded-lg p-4 hover:bg-[#00ff9d]/10 transition-colors cursor-pointer">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h4 class="font-medium">BTC > $30K in April</h4>
+                                <p class="text-sm text-gray-400">Resolved: April 28, 2023</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm text-green-400">RESULT: YES ✓</p>
+                                <p class="text-sm text-gray-400">Total Volume: $782K</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cyber-border rounded-lg p-4 hover:bg-[#00ff9d]/10 transition-colors cursor-pointer">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h4 class="font-medium">Apple AR Glasses Launch</h4>
+                                <p class="text-sm text-gray-400">Resolved: March 15, 2023</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm text-red-400">RESULT: NO ✗</p>
+                                <p class="text-sm text-gray-400">Total Volume: $543K</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cyber-border rounded-lg p-4 hover:bg-[#00ff9d]/10 transition-colors cursor-pointer">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h4 class="font-medium">Man City Win UCL</h4>
+                                <p class="text-sm text-gray-400">Resolved: June 10, 2023</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm text-green-400">RESULT: YES ✓</p>
+                                <p class="text-sm text-gray-400">Total Volume: $921K</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 w-full bg-black/90 backdrop-blur-sm border-t border-[#00ff9d]/30">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-around py-3">
+                <button class="flex flex-col items-center">
+                    <i class="bi bi-house-door-fill text-xl text-[#00ccff]"></i>
+                    <span class="text-xs mt-1">Home</span>
+                </button>
+                <button class="flex flex-col items-center">
+                    <i class="bi bi-trophy text-xl"></i>
+                    <span class="text-xs mt-1">Leaderboard</span>
+                </button>
+                <button id="create-btn" class="flex flex-col items-center relative -mt-5">
+                    <div class="bg-[#00ff9d] rounded-full p-3 create-btn">
+                        <i class="bi bi-plus text-3xl text-black"></i>
+                    </div>
+                    <span class="text-xs mt-1">Create</span>
+                </button>
+                <button class="flex flex-col items-center">
+                    <i class="bi bi-people text-xl"></i>
+                    <span class="text-xs mt-1">Friends</span>
+                </button>
+                <button class="flex flex-col items-center">
+                    <i class="bi bi-person text-xl"></i>
+                    <span class="text-xs mt-1">Profile</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Create Bet Modal (Hidden by default) -->
+    <div id="create-modal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center hidden">
+        <div class="bg-[#0a0a1f] cyber-border rounded-lg w-full max-w-md mx-4 p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold cyber-glow">Create New Prediction</h2>
+                <button id="close-modal" class="text-gray-400 hover:text-white">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <form>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm mb-2">Prediction Title</label>
+                        <input type="text" class="w-full bg-[#151530] cyber-border rounded p-3 text-white" 
+                            placeholder="E.g. BTC > $50K by end of 2023">
+                    </div>
+                    <div>
+                        <label class="block text-sm mb-2">Category</label>
+                        <select class="w-full bg-[#151530] cyber-border rounded p-3 text-white">
+                            <option>Crypto</option>
+                            <option>Sports</option>
+                            <option>Politics</option>
+                            <option>Entertainment</option>
+                            <option>Technology</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm mb-2">Outcome Type</label>
+                        <div class="flex space-x-4">
+                            <label class="flex items-center">
+                                <input type="radio" name="outcome" checked class="mr-2">
+                                <span>Yes/No</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="outcome" class="mr-2">
+                                <span>Multiple Choice</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm mb-2">End Date</label>
+                        <input type="date" class="w-full bg-[#151530] cyber-border rounded p-3 text-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm mb-2">Description (Optional)</label>
+                        <textarea class="w-full bg-[#151530] cyber-border rounded p-3 text-white h-24" 
+                            placeholder="Add additional details about your prediction"></textarea>
+                    </div>
+                    <button type="button" class="w-full bg-[#00ff9d] text-black font-bold py-3 rounded-lg hover:bg-[#00ccff] transition-colors">
+                        Create Prediction
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ThreeJS background
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('three-canvas'), alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        // Create grid
+        const size = 20;
+        const divisions = 20;
+        const gridHelper = new THREE.GridHelper(size, divisions, 0x00ff9d, 0x00ccff);
+        scene.add(gridHelper);
+
+        // Add particles
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particleCount = 1000;
+        const particlesPositions = new Float32Array(particleCount * 3);
+        
+        for (let i = 0; i < particleCount * 3; i += 3) {
+            particlesPositions[i] = (Math.random() - 0.5) * 30;
+            particlesPositions[i + 1] = (Math.random() - 0.5) * 30;
+            particlesPositions[i + 2] = (Math.random() - 0.5) * 30;
+        }
+        
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(particlesPositions, 3));
+        const particlesMaterial = new THREE.PointsMaterial({ 
+            color: 0x00ccff, 
+            size: 0.05,
+            transparent: true,
+            opacity: 0.7
+        });
+        const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particles);
+
+        camera.position.z = 5;
+        camera.position.y = 1;
+
+        // Animation
+        function animate() {
+            requestAnimationFrame(animate);
+            gridHelper.rotation.y += 0.002;
+            particles.rotation.y += 0.001;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Tab functionality
+        const tabs = ['live', 'trending', 'resolved'];
+        tabs.forEach(tab => {
+            document.getElementById(`tab-${tab}`).addEventListener('click', () => {
+                // Hide all content
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.add('hidden');
+                });
+                // Show selected content
+                document.getElementById(`content-${tab}`).classList.remove('hidden');
+                
+                // Update active tab styling
+                tabs.forEach(t => {
+                    document.getElementById(`tab-${t}`).classList.remove('tab-active');
+                });
+                document.getElementById(`tab-${tab}`).classList.add('tab-active');
+            });
+        });
+
+        // Modal functionality
+        const createBtn = document.getElementById('create-btn');
+        const createModal = document.getElementById('create-modal');
+        const closeModal = document.getElementById('close-modal');
+        
+        createBtn.addEventListener('click', () => {
+            createModal.classList.remove('hidden');
+        });
+        
+        closeModal.addEventListener('click', () => {
+            createModal.classList.add('hidden');
+        });
+
+        // Close modal when clicking outside
+        createModal.addEventListener('click', (e) => {
+            if (e.target === createModal) {
+                createModal.classList.add('hidden');
+            }
+        });
+
+        // Animated counter for stats
+        document.querySelectorAll('.stats-counter').forEach(counter => {
+            const target = parseInt(counter.innerText.replace(/[^0-9]/g, ''));
+            let current = 0;
+            const increment = target / 50;
+            const updateCounter = () => {
+                if (current < target) {
+                    current += increment;
+                    counter.innerText = Math.ceil(current).toLocaleString();
+                    requestAnimationFrame(updateCounter);
+                } else {
+                    counter.innerText = target.toLocaleString();
+                }
+            };
+            updateCounter();
+        });
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
